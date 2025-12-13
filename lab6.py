@@ -10,23 +10,21 @@ class FileCorrupted(Exception):
     pass
 
 
-def logged(exception_type, mode="console"):
+def logged(exception_type, mode="file"):
     def decorator(func):
 
         logger = logging.getLogger(func.__name__)
         logger.setLevel(logging.ERROR)
 
-        if logger.hasHandlers():
-            logger.handlers.clear()
+        if not logger.hasHandlers():
+            if mode == "console":
+                handler = logging.StreamHandler()
+            else:
+                handler = logging.FileHandler("log.txt", encoding="utf-8")
 
-        if mode == "console":
-            handler = logging.StreamHandler()
-        else:
-            handler = logging.FileHandler("log.txt", encoding="utf-8")
-
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -44,7 +42,7 @@ def logged(exception_type, mode="console"):
 
 class JsonFileManager:
 
-    @logged(FileNotFound, mode="console")
+    @logged(FileNotFound, mode="file")
     def __init__(self, path: str):
         self.path = path
 
