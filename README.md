@@ -1,2 +1,2 @@
 # team-homework
-My uni lab
+My uni homework for command work
